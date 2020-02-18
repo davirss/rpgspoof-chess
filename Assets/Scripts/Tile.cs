@@ -13,6 +13,9 @@ public class Tile : MonoBehaviour {
     Piece PopulatedBy = null;
     BoardController boardController;
 
+    public int row {get; private set;}
+    public int column {get; private set;}
+
     void Start()
     {
         boardController = GetComponentInParent(typeof(BoardController)) as BoardController;
@@ -22,10 +25,9 @@ public class Tile : MonoBehaviour {
     {   
     }
 
-    /// </summary>
     void OnMouseOver()
     {
-        GetComponent<Renderer>().material.color = Color.grey;
+        // GetComponent<Renderer>().material.color = Color.grey;
     }
 
     void OnMouseExit()
@@ -58,5 +60,10 @@ public class Tile : MonoBehaviour {
 
     private void OnMouseDown() {
         boardController.NotifyTileClicked(this);
+    }
+
+    public void SetCoordinates(int row, int column) {
+        this.row = row;
+        this.column = column;
     }
 }

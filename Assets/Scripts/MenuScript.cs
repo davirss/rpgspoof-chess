@@ -22,9 +22,11 @@ public class MenuScript {
             var tile = GameObject.Instantiate(prefab, new Vector3(column, 0, row), Quaternion.identity);
             tile.name = "Tile " + row + "/" + column;
             tile.transform.parent = board.transform;
-            tileArray[row, column] = tile.GetComponent<Tile>();
+            var currentTile = tile.GetComponent<Tile>();
+            currentTile.SetCoordinates(row, column);
+            tileArray[row, column] = currentTile;
         }
 
-        board.GetComponent<BoardController>().SetTileArray(tileArray);
+        // board.GetComponent<BoardController>().SetTileArray(tileArray);
     } 
 }
