@@ -75,29 +75,33 @@ public class BoardController : MonoBehaviour {
 
         if (direction.IsDiagonalDirection()) {
             for (int x = movement.minAmount; x <= movementAmount; x++) {
+                var breakMovement = false;
+
                 var rowIndex = currentPieceRow + (x * rowDirectionOperation);
                 var columnIndex = currentPieceColumn + (x * columnDirectionOperation);
 
-                if (rowIndex >= 8 || columnIndex >= 8 || columnIndex < 0 || rowIndex < 0) continue;
+                if (rowIndex >= 8 || columnIndex >= 8 || columnIndex < 0 || rowIndex < 0) break;
 
-                Debug.Log("Moving this " + rowIndex + " " + columnIndex);
                 var tileObject = this.tileArray[rowIndex, columnIndex];
                 var highlightedTile = tileObject.GetComponent<Tile>();
 
                 if (highlightedTile.PopulatedBy == null) {
                     highlightedTile.possible = true;
-                } else if (highlightedTile.PopulatedBy.owner == Owner.FRIEND) {
+                } else if (highlightedTile.PopulatedBy.owner == selectedPiece.owner) {
                     highlightedTile.possible = false;
-                    break;
-                } else if (highlightedTile.PopulatedBy.owner == Owner.FOE) {
+                    breakMovement = true;
+                } else if (highlightedTile.PopulatedBy.owner != selectedPiece.owner) {
                     highlightedTile.target = true;
-                    break;
+                    breakMovement = true;
                 }
 
                 previousHighlight.Add(tileObject);
+
+                if (breakMovement) break;
             }
         } else {
             for (int x = movement.minAmount; x <= movementAmount; x++) {
+                var breakMovement = false;
 
                 var rowIndex = currentPieceRow;
                 var columnIndex = currentPieceColumn;
@@ -109,7 +113,6 @@ public class BoardController : MonoBehaviour {
 
                 if (rowIndex >= 8 || columnIndex >= 8 || columnIndex < 0 || rowIndex < 0) continue;
 
-                Debug.Log("Moving this " + rowIndex + " " + columnIndex);
                 var tileObject = this.tileArray[rowIndex, columnIndex];
                 var highlightedTile = tileObject.GetComponent<Tile>();
 
@@ -117,13 +120,15 @@ public class BoardController : MonoBehaviour {
                     highlightedTile.possible = true;
                 } else if (highlightedTile.PopulatedBy.owner == selectedPiece.owner) {
                     highlightedTile.possible = false;
-                    break;
+                    breakMovement = true;
                 } else if (highlightedTile.PopulatedBy.owner != selectedPiece.owner) {
                     highlightedTile.target = true;
-                    break;
+                    breakMovement = true;
                 }
 
                 previousHighlight.Add(tileObject);
+
+                if (breakMovement) break;
             }
         }
     }
