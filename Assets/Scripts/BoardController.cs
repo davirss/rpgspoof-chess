@@ -88,8 +88,10 @@ public class BoardController : MonoBehaviour {
                     highlightedTile.possible = true;
                 } else if (highlightedTile.PopulatedBy.owner == Owner.FRIEND) {
                     highlightedTile.possible = false;
+                    break;
                 } else if (highlightedTile.PopulatedBy.owner == Owner.FOE) {
                     highlightedTile.target = true;
+                    break;
                 }
 
                 previousHighlight.Add(tileObject);
@@ -113,10 +115,12 @@ public class BoardController : MonoBehaviour {
 
                 if (highlightedTile.PopulatedBy == null) {
                     highlightedTile.possible = true;
-                } else if (highlightedTile.PopulatedBy.owner == Owner.FRIEND) {
+                } else if (highlightedTile.PopulatedBy.owner == selectedPiece.owner) {
                     highlightedTile.possible = false;
-                } else if (highlightedTile.PopulatedBy.owner == Owner.FOE) {
+                    break;
+                } else if (highlightedTile.PopulatedBy.owner != selectedPiece.owner) {
                     highlightedTile.target = true;
+                    break;
                 }
 
                 previousHighlight.Add(tileObject);
@@ -125,7 +129,19 @@ public class BoardController : MonoBehaviour {
     }
 
     public void NotifyTileClicked(Tile tile) {
-        if (selectedPiece != null && !tile.IsPopulated) {
+        if (selectedPiece != null && (selectedPiece.currentTile == null || tile.possible || tile.target)) {
+
+            if (tile.IsPopulated && tile.PopulatedBy.owner == selectedPiece.owner) {
+                Debug.Log(tile.PopulatedBy.owner + " " + selectedPiece.owner);
+                return;
+            }
+
+            if (tile.IsPopulated) {
+                var piece = tile.PopulatedBy;
+                tile.PopulateWith(null);
+                piece.gameObject.SetActive(false);
+            } 
+
             var piecePosition = selectedPiece.transform.position;
             var tilePosition = tile.transform.position;
             selectedPiece.transform.position = new Vector3(tilePosition.x, piecePosition.y, tilePosition.z);
