@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 public class BoardController : MonoBehaviour {
 
     private Piece selectedPiece = null;
@@ -6,6 +8,8 @@ public class BoardController : MonoBehaviour {
 
     private static int ROW_SIZE = 8;
     private static int COLUMN_SIZE = 8;
+
+    private List<GameObject> previousHighlight = new List<GameObject>();
 
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
@@ -29,7 +33,12 @@ public class BoardController : MonoBehaviour {
 
     public void NotifyPieceSelected(Piece piece)
     {
+        ClearHighlighted();
         ToggleSelectedPiece(piece);
+
+        if (piece.currentTile != null) {
+            HighlightPossibleMoves();
+        }
     }
 
     public void ToggleSelectedPiece(Piece piece)
@@ -50,10 +59,6 @@ public class BoardController : MonoBehaviour {
                 highlighDirection(movement);
             }
         }
-        //peça vai ter uma matriz de movimentação
-        //Dada a matriz de movimentação, percorrer os tiles refente ao movimento
-        //Atualizar o status to tile (movimento possivel, n sei)
-        //Checar se tem algum inimigo, se tiver, ativa a target
     }
 
     private void highlighDirection(BaseMovement movement) {
@@ -63,47 +68,59 @@ public class BoardController : MonoBehaviour {
         var currentPieceColumn = selectedPiece.currentTile.column;
         var direction = movement.direction;
 
-        if (direction.IsDiagonalDirection()) {
-            int rowDirectionOperation = direction.isUp() ? -1 : 1;
-            int columnDirectionOperation = direction.isRight() ?  1 : -1;            
+        int rowDirectionOperation = direction.isUp() ? -1 : 1;
+        int columnDirectionOperation = direction.isRight() ?  1 : -1;
 
-            for (int x = movement.minAmount; x <= movement.amount; x++) {
+        var movementAmount = movement.amount == -1 ? 8 : movement.amount;
+
+        if (direction.IsDiagonalDirection()) {
+            for (int x = movement.minAmount; x <= movementAmount; x++) {
                 var rowIndex = currentPieceRow + (x * rowDirectionOperation);
                 var columnIndex = currentPieceColumn + (x * columnDirectionOperation);
 
+                if (rowIndex >= 8 || columnIndex >= 8 || columnIndex < 0 || rowIndex < 0) continue;
+
                 Debug.Log("Moving this " + rowIndex + " " + columnIndex);
-                var highlightedTile = this.tileArray[rowIndex, columnIndex];
-                highlightedTile.GetComponent<Tile>().possible = true;
+                var tileObject = this.tileArray[rowIndex, columnIndex];
+                var highlightedTile = tileObject.GetComponent<Tile>();
 
-                // var rowDirection = currentPieceRow + (x * rowDirectionOperation);
-                // var columnDirection = currentPieceColumn + (x * columnDirectionOperation);
-            
-                // int rowIndex = 0;
-                // int columnIndex = 0;
+                if (highlightedTile.PopulatedBy == null) {
+                    highlightedTile.possible = true;
+                } else if (highlightedTile.PopulatedBy.owner == Owner.FRIEND) {
+                    highlightedTile.possible = false;
+                } else if (highlightedTile.PopulatedBy.owner == Owner.FOE) {
+                    highlightedTile.target = true;
+                }
 
-                // if (rowDirection < 0) {
-                //     rowIndex = 0;
-                // } else if (rowDirection >= 8) {
-                //     rowIndex = 7;
-                // } else {
-                //     rowIndex = rowDirection;
-                // }
-
-                // if (columnDirection < 0) {
-                //     columnIndex = 0;
-                // } else if (columnDirection >= 8) {
-                //     columnIndex = 7;
-                // } else {
-                //     columnIndex = columnDirection;
-                // }
-                // Debug.Log("Fetching this tile: Row "  + rowIndex + " Column: " + columnIndex);
-
-                // var highlightedTile = tileArray[rowIndex, columnIndex];
-
-                // highlightedTile.possible = true;
+                previousHighlight.Add(tileObject);
             }
         } else {
-            //Highlight Cardinal (up, down, left, right)
+            for (int x = movement.minAmount; x <= movementAmount; x++) {
+
+                var rowIndex = currentPieceRow;
+                var columnIndex = currentPieceColumn;
+                if (movement.direction == Direction.UP || movement.direction == Direction.DOWN) {
+                    rowIndex = currentPieceRow + (x * rowDirectionOperation);
+                } else if (movement.direction == Direction.LEFT || movement.direction == Direction.RIGHT) {
+                    columnIndex = currentPieceColumn + (x * columnDirectionOperation);
+                }
+
+                if (rowIndex >= 8 || columnIndex >= 8 || columnIndex < 0 || rowIndex < 0) continue;
+
+                Debug.Log("Moving this " + rowIndex + " " + columnIndex);
+                var tileObject = this.tileArray[rowIndex, columnIndex];
+                var highlightedTile = tileObject.GetComponent<Tile>();
+
+                if (highlightedTile.PopulatedBy == null) {
+                    highlightedTile.possible = true;
+                } else if (highlightedTile.PopulatedBy.owner == Owner.FRIEND) {
+                    highlightedTile.possible = false;
+                } else if (highlightedTile.PopulatedBy.owner == Owner.FOE) {
+                    highlightedTile.target = true;
+                }
+
+                previousHighlight.Add(tileObject);
+            }
         }
     }
 
@@ -115,7 +132,14 @@ public class BoardController : MonoBehaviour {
 
             tile.PopulateWith(selectedPiece);
             selectedPiece.SetCurrentTile(tile);
+            ClearHighlighted();
             HighlightPossibleMoves();
+        }
+    }
+
+    private void ClearHighlighted() {
+        foreach(GameObject tile in previousHighlight) {
+            tile.GetComponent<Tile>().ResetState();
         }
     }
 

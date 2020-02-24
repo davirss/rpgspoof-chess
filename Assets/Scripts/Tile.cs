@@ -10,11 +10,12 @@ public class Tile : MonoBehaviour {
     public bool target = false;
     public bool current = false;
     public bool possible = false;
-    Piece PopulatedBy = null;
+    public Piece PopulatedBy = null;
     BoardController boardController;
 
     public int row {get; private set;}
     public int column {get; private set;}
+    private bool isHovered = false;
 
     void Start()
     {
@@ -22,27 +23,32 @@ public class Tile : MonoBehaviour {
     }
 
     void Update()
-    {   
-    }
-
-    void OnMouseOver()
-    {
-        // GetComponent<Renderer>().material.color = Color.grey;
-    }
-
-    void OnMouseExit()
     {
         UpdateColor();
     }
 
+    void OnMouseOver()
+    {
+        isHovered = true;
+    }
+
+    void OnMouseExit()
+    {
+        isHovered = false;
+    }
+
     private void UpdateColor() {
-        if (target)
+        if (isHovered)
         {
-            GetComponent<Renderer>().material.color = Color.green;
+            GetComponent<Renderer>().material.color = Color.grey;
+        }
+        else if (target) 
+        {
+            GetComponent<Renderer>().material.color = Color.red;
         } 
         else if (current) 
         {
-            GetComponent<Renderer>().material.color = Color.red;
+            GetComponent<Renderer>().material.color = Color.green;
         } 
         else if (possible)
         {
@@ -52,6 +58,12 @@ public class Tile : MonoBehaviour {
         {
             GetComponent<Renderer>().material.color = Color.white;
         }
+    }
+
+    public void ResetState() {
+        this.target = false;
+        this.current = false;
+        this.possible = false;
     }
 
     public void PopulateWith(Piece piece) {
