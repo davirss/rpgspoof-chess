@@ -1,172 +1,84 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-public class BoardController : MonoBehaviour {
+using UnityEngine;
+public class BoardController : StateMachine {
 
-    private Piece selectedPiece = null;
-    private GameObject[,] tileArray = new GameObject[ROW_SIZE, COLUMN_SIZE];
-
-    private static int ROW_SIZE = 8;
-    private static int COLUMN_SIZE = 8;
+    public static readonly int ROW_SIZE = 8;
+    public static readonly int COLUMN_SIZE = 8;
 
     private List<GameObject> previousHighlight = new List<GameObject>();
+    private List<GameObject> highlights = new List<GameObject>();
+
+    public Piece[, ] tiles { get; set; }
+
+    public Piece SelectedPiece { get; set; }
+    public bool PlayerTeam { get; private set; }
 
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
     /// any of the Update methods is called the first time.
     /// </summary>
-    void Start()
-    {
-        GameObject prefab = Resources.Load<GameObject>("Prefabs/Cube");
-
-        for(int i = 0; i < ROW_SIZE * COLUMN_SIZE; i++) {
-            var column = i % COLUMN_SIZE;
-            var row = i / ROW_SIZE;
-            var tile = GameObject.Instantiate(prefab, new Vector3(column, 0, row), Quaternion.identity);
-            tile.name = "Tile " + row + "/" + column;
-            tile.transform.parent = this.transform;
-            var currentTile = tile.GetComponent<Tile>();
-            currentTile.SetCoordinates(row, column);
-            tileArray[row, column] = tile;
+    void Start() {
+        tiles = new Piece[ROW_SIZE, COLUMN_SIZE];
+        for (int i = 0; i < ROW_SIZE * COLUMN_SIZE; i++) {
+            int column = i % COLUMN_SIZE;
+            int row = i / ROW_SIZE;
+            tiles[row, column] = null;
         }
+        PlayerTeam = false;
+        SelectedPiece = null;
     }
 
-    public void NotifyPieceSelected(Piece piece)
-    {
+    public void Select(Vector2Int t) {
+        StartCoroutine(State.Select(t));
+    }
+
+    public void Cancel() {
+        StartCoroutine(State.Cancel());
+    }
+
+    public void NotifyPieceSelected(Piece piece) {
         ClearHighlighted();
-        ToggleSelectedPiece(piece);
-
-        if (piece.currentTile != null) {
-            HighlightPossibleMoves();
-        }
+        HighlightPossibleMoves();
     }
 
-    public void ToggleSelectedPiece(Piece piece)
-    {
-        if (selectedPiece != null)
-        {
-            selectedPiece.isSelected = false;
-        }
-        selectedPiece = piece;
-        selectedPiece.isSelected = true;
-    }
+    public void HighlightPossibleMoves() {
 
-    public void HighlightPossibleMoves()
-    {   
-        for (int column = 0; column < 3; column++) {
-            for (int row = 0; row < 3; row++) {
-                var movement = selectedPiece.movement[column, row];
-                highlighDirection(movement);
-            }
-        }
     }
 
     private void highlighDirection(BaseMovement movement) {
-        if (movement.amount == 0) return;
 
-        var currentPieceRow = selectedPiece.currentTile.row;
-        var currentPieceColumn = selectedPiece.currentTile.column;
-        var direction = movement.direction;
-
-        int rowDirectionOperation = direction.isUp() ? -1 : 1;
-        int columnDirectionOperation = direction.isRight() ?  1 : -1;
-
-        var movementAmount = movement.amount == -1 ? 8 : movement.amount;
-
-        if (direction.IsDiagonalDirection()) {
-            for (int x = movement.minAmount; x <= movementAmount; x++) {
-                var breakMovement = false;
-
-                var rowIndex = currentPieceRow + (x * rowDirectionOperation);
-                var columnIndex = currentPieceColumn + (x * columnDirectionOperation);
-
-                if (rowIndex >= 8 || columnIndex >= 8 || columnIndex < 0 || rowIndex < 0) break;
-
-                var tileObject = this.tileArray[rowIndex, columnIndex];
-                var highlightedTile = tileObject.GetComponent<Tile>();
-
-                if (highlightedTile.PopulatedBy == null) {
-                    highlightedTile.possible = true;
-                } else if (highlightedTile.PopulatedBy.owner == selectedPiece.owner) {
-                    highlightedTile.possible = false;
-                    breakMovement = true;
-                } else if (highlightedTile.PopulatedBy.owner != selectedPiece.owner) {
-                    highlightedTile.target = true;
-                    breakMovement = true;
-                }
-
-                previousHighlight.Add(tileObject);
-
-                if (breakMovement) break;
-            }
-        } else {
-            for (int x = movement.minAmount; x <= movementAmount; x++) {
-                var breakMovement = false;
-
-                var rowIndex = currentPieceRow;
-                var columnIndex = currentPieceColumn;
-                if (movement.direction == Direction.UP || movement.direction == Direction.DOWN) {
-                    rowIndex = currentPieceRow + (x * rowDirectionOperation);
-                } else if (movement.direction == Direction.LEFT || movement.direction == Direction.RIGHT) {
-                    columnIndex = currentPieceColumn + (x * columnDirectionOperation);
-                }
-
-                if (rowIndex >= 8 || columnIndex >= 8 || columnIndex < 0 || rowIndex < 0) continue;
-
-                var tileObject = this.tileArray[rowIndex, columnIndex];
-                var highlightedTile = tileObject.GetComponent<Tile>();
-
-                if (highlightedTile.PopulatedBy == null) {
-                    highlightedTile.possible = true;
-                } else if (highlightedTile.PopulatedBy.owner == selectedPiece.owner) {
-                    highlightedTile.possible = false;
-                    breakMovement = true;
-                } else if (highlightedTile.PopulatedBy.owner != selectedPiece.owner) {
-                    highlightedTile.target = true;
-                    breakMovement = true;
-                }
-
-                previousHighlight.Add(tileObject);
-
-                if (breakMovement) break;
-            }
-        }
     }
 
-    public void NotifyTileClicked(Tile tile) {
-        if (selectedPiece != null && (selectedPiece.currentTile == null || tile.possible || tile.target)) {
+    // public void NotifyTileClicked(Tile tile) {
+    //     if (selectedPiece != null && (selectedPiece.currentTile == null || tile.possible || tile.target)) {
 
-            if (tile.IsPopulated && tile.PopulatedBy.owner == selectedPiece.owner) {
-                Debug.Log(tile.PopulatedBy.owner + " " + selectedPiece.owner);
-                return;
-            }
+    //         if (tile.IsPopulated && tile.piece.owner == selectedPiece.owner) {
+    //             Debug.Log(tile.piece.owner + " " + selectedPiece.owner);
+    //             return;
+    //         }
 
-            if (tile.IsPopulated) {
-                var piece = tile.PopulatedBy;
-                tile.PopulateWith(null);
-                piece.gameObject.SetActive(false);
-            } 
+    //         if (tile.IsPopulated) {
+    //             Piece piece = tile.piece;
+    //             tile.SetPiece(null);
+    //             piece.gameObject.SetActive(false);
+    //         }
 
-            var piecePosition = selectedPiece.transform.position;
-            var tilePosition = tile.transform.position;
-            selectedPiece.transform.position = new Vector3(tilePosition.x, piecePosition.y, tilePosition.z);
+    //         Vector3 piecePosition = selectedPiece.transform.position;
+    //         //selectedPiece.transform.position = new Vector3(tilePosition.x, piecePosition.y, tilePosition.z);
 
-            tile.PopulateWith(selectedPiece);
-            selectedPiece.SetCurrentTile(tile);
-            ClearHighlighted();
-            HighlightPossibleMoves();
-        }
-    }
+    //         tile.SetPiece(selectedPiece);
+    //         selectedPiece.SetCurrentTile(tile);
+    //         ClearHighlighted();
+    //         HighlightPossibleMoves();
+    //     }
+    // }
 
     private void ClearHighlighted() {
-        foreach(GameObject tile in previousHighlight) {
-            tile.GetComponent<Tile>().ResetState();
+        foreach (GameObject h in highlights) {
+            Destroy(h);
         }
-    }
-
-    public void SetTileArray(GameObject[,] array)
-    {
-        this.tileArray = array;
+        highlights.Clear();
     }
 
 }
