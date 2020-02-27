@@ -21,11 +21,11 @@ Material:
     m_TexEnvs:
     - _Albedo:
         m_Texture: {fileID: 2800000, guid: 42766420ef2d1624ba2e3cb141525c13, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 2, y: 1}
         m_Offset: {x: 0, y: 0}
     - _AlbedoParallaxMap:
         m_Texture: {fileID: 2800000, guid: 623b505b19381fa41a924bb7bc74bdd6, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 2, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 0}
@@ -95,7 +95,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SparklesParallaxScale: 0.2
     - _SparklesPower: 20
-    - _SparklesScale: 2
+    - _SparklesScale: 1
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
@@ -110,4 +110,4 @@ Material:
     - _SparklesColor: {r: 47.937256, g: 39.83482, b: 12.224, a: 1}
     - _SparksColor: {r: 16, g: 16, b: 16, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _TilingOffset: {r: 2, g: 1, b: 0, a: 0}
+    - _TilingOffset: {r: 1, g: 1, b: 0, a: 0}
