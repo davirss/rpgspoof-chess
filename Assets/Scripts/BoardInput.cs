@@ -18,16 +18,23 @@ public class BoardInput : MonoBehaviour {
         float distance;
         if (plane.Raycast(ray, out distance)) {
             Vector3 pos = ray.GetPoint(distance);
-            Vector2Int t = GetTile(pos);
+            Vector2Int t = WorldToTile(pos);
             if (t != currentTile) {
                 currentTile = t;
+                board.ChangeTile(t);
             }
         }
     }
 
-    public Vector2Int GetTile(Vector3 pos) {
+    public static Vector2Int WorldToTile(Vector3 pos) {
         Vector2 t = new Vector2(pos.x, pos.z) / TILE_SIZE + new Vector2(TILE_OFFSET, TILE_OFFSET);
         return new Vector2Int(Mathf.FloorToInt(t.x), Mathf.FloorToInt(t.y));
+    }
+
+    public static Vector3 TileToWorld(Vector2Int tile) {
+        Vector3 pos = new Vector3(tile.x - TILE_OFFSET, 0, tile.y - TILE_OFFSET);
+        pos *= TILE_SIZE;
+        return pos;
     }
 
     public void Select() {
@@ -35,6 +42,6 @@ public class BoardInput : MonoBehaviour {
     }
 
     public void Cancel() {
-
+        board.Cancel();
     }
 }

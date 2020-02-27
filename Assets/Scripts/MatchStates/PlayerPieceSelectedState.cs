@@ -13,4 +13,9 @@ public class PlayerPieceSelectedState : MatchState {
         Board.SetState(new PlayerTurnState(Board));
         yield break;
     }
+
+    public override IEnumerator ChangeTile(Vector2Int t) {
+        Board.highlightSystem.SetFocus(t);
+        yield break;
+    }
 }

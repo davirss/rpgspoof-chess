@@ -18,4 +18,7 @@ public abstract class MatchState {
     public virtual IEnumerator Cancel() {
         yield break;
     }
+    public virtual IEnumerator ChangeTile(Vector2Int t) {
+        yield break;
+    }
 }

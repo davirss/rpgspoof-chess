@@ -1,23 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+[RequireComponent(typeof(HighlightSystem))]
 public class BoardController : StateMachine {
 
     public static readonly int ROW_SIZE = 8;
     public static readonly int COLUMN_SIZE = 8;
 
-    private List<GameObject> previousHighlight = new List<GameObject>();
-    private List<GameObject> highlights = new List<GameObject>();
-
     public Piece[, ] tiles { get; set; }
-
     public Piece SelectedPiece { get; set; }
     public bool PlayerTeam { get; private set; }
+    public HighlightSystem highlightSystem { get; private set; }
 
-    /// <summary>
-    /// Start is called on the frame when a script is enabled just before
-    /// any of the Update methods is called the first time.
-    /// </summary>
+    void Awake() {
+        highlightSystem = GetComponent<HighlightSystem>();
+    }
+
     void Start() {
         tiles = new Piece[ROW_SIZE, COLUMN_SIZE];
         for (int i = 0; i < ROW_SIZE * COLUMN_SIZE; i++) {
@@ -37,8 +36,11 @@ public class BoardController : StateMachine {
         StartCoroutine(State.Cancel());
     }
 
+    public void ChangeTile(Vector2Int t) {
+        StartCoroutine(State.ChangeTile(t));
+    }
+
     public void NotifyPieceSelected(Piece piece) {
-        ClearHighlighted();
         HighlightPossibleMoves();
     }
 
@@ -73,12 +75,4 @@ public class BoardController : StateMachine {
     //         HighlightPossibleMoves();
     //     }
     // }
-
-    private void ClearHighlighted() {
-        foreach (GameObject h in highlights) {
-            Destroy(h);
-        }
-        highlights.Clear();
-    }
-
 }
