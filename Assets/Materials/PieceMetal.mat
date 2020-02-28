@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: PieceStone
+  m_Name: PieceMetal
   m_Shader: {fileID: 4800000, guid: 2c6abceb7f5578240ae70647da103f7d, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -24,11 +24,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _AlbedoTeam0:
-        m_Texture: {fileID: 2800000, guid: 2d9b5cc1af9e41948bc1e4fa75337873, type: 3}
+        m_Texture: {fileID: 2800000, guid: 98e40c00f3acad34295a2491b622ab93, type: 3}
         m_Scale: {x: 0.5, y: 0.5}
         m_Offset: {x: 0, y: 0}
     - _AlbedoTeam1:
-        m_Texture: {fileID: 2800000, guid: 15094ecf172f38440bba12aec51dfa20, type: 3}
+        m_Texture: {fileID: 2800000, guid: 98e40c00f3acad34295a2491b622ab93, type: 3}
         m_Scale: {x: 0.5, y: 0.5}
         m_Offset: {x: 0, y: 0}
     - _AlbedoTeam2:
@@ -64,7 +64,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normal:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: bd734c29baceb63499732f24fbaea45f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -101,7 +101,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _Metallic: 0
+    - _Metallic: 0.7
     - _NormalScale: 1
     - _OcclusionStrength: 1
     - _QueueOffset: 0
@@ -120,11 +120,11 @@ Material:
     m_Colors:
     - _BaseColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-    - _ColorTeam0: {r: 0.85, g: 0.8333334, b: 0.7733334, a: 1}
-    - _ColorTeam1: {r: 0.51611996, g: 0.44932795, b: 0.759, a: 1}
+    - _ColorTeam0: {r: 1, g: 0.792165, b: 0.43999997, a: 1}
+    - _ColorTeam1: {r: 0.627451, g: 0.6745098, b: 1, a: 1}
     - _DissolveColor: {r: 3.7643232, g: 1.0799999, b: 8, a: 1}
-    - _DissolveColor0: {r: 8, g: 3.4011319, b: 0, a: 1}
-    - _DissolveColor1: {r: 4.423977, g: 0, b: 8, a: 1}
+    - _DissolveColor0: {r: 7.999999, g: 3.3710685, b: 0, a: 1}
+    - _DissolveColor1: {r: 3.696552, g: 0, b: 7.999999, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _TriplanarTiling: {r: 0.2, g: 0.2, b: 0, a: 0}
